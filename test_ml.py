@@ -1,28 +1,77 @@
 import pytest
-# TODO: add necessary import
+import pandas as pd
+from ml.data import process_data
+from ml.model import (
+    train_model,
+    inference,
+    compute_model_metrics,
+    save_model,
+    load_model,
+    performance_on_categorical_slice,
+)
 
-# TODO: implement the first test. Change the function name and input as needed
-def test_one():
+@pytest.fixture
+def data_and_model():
     """
-    # add description for the first test
+    Loads census data, preprocesses it, trains the model,
+    and returns necessary components for testing.
     """
-    # Your code here
-    pass
+    data = pd.read_csv("data/census.csv")
 
+    categorical_features = [
+        "workclass",
+        "education",
+        "marital-status",
+        "occupation",
+        "relationship",
+        "race",
+        "sex",
+        "native-country",
+    ]
+    label = "salary"  # Make sure this matches your dataset's target column
 
-# TODO: implement the second test. Change the function name and input as needed
-def test_two():
-    """
-    # add description for the second test
-    """
-    # Your code here
-    pass
+    X, y, encoder, lb = process_data(
+        data, categorical_features=categorical_features, label=label, training=True
+    )
+    model = train_model(X, y)
 
+    return data, categorical_features, label, encoder, lb, model, X, y
 
-# TODO: implement the third test. Change the function name and input as needed
-def test_three():
+def test_model_training_and_inference(data_and_model):
     """
-    # add description for the third test
+    Test model training and inference output length.
     """
-    # Your code here
-    pass
+    _, _, _, _, _, model, X, y = data_and_model
+    preds = inference(model, X)
+    assert len(preds) == len(y), "Prediction length should match labels length"
+
+def test_model_metrics_computation(data_and_model):
+    """
+    Test compute_model_metrics returns valid scores between 0 and 1.
+    """
+    _, _, _, _, _, model, X, y = data_and_model
+    preds = inference(model, X)
+    precision, recall, fbeta = compute_model_metrics(y, preds)
+    assert 0 <= precision <= 1
+    assert 0 <= recall <= 1
+    assert 0 <= fbeta <= 1
+
+def test_performance_on_data_slice(data_and_model):
+    """
+    Test performance metrics on a slice of the data.
+    """
+    data, categorical_features, label, encoder, lb, model, _, _ = data_and_model
+    slice_value = data["workclass"].iloc[0]
+    precision, recall, fbeta = performance_on_categorical_slice(
+        data=data,
+        column_name="workclass",
+        slice_value=slice_value,
+        categorical_features=categorical_features,
+        label=label,
+        encoder=encoder,
+        lb=lb,
+        model=model,
+    )
+    assert 0 <= precision <= 1
+    assert 0 <= recall <= 1
+    assert 0 <= fbeta <= 1
