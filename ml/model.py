@@ -1,9 +1,3 @@
-import inspect
-from ml.data import process_data
-
-print("process_data is from:", inspect.getfile(process_data))
-print("process_data signature:", inspect.signature(process_data))
-
 
 
 import pickle
