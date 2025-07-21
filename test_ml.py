@@ -5,8 +5,6 @@ from ml.model import (
     train_model,
     inference,
     compute_model_metrics,
-    save_model,
-    load_model,
     performance_on_categorical_slice,
 )
 
@@ -28,7 +26,7 @@ def data_and_model():
         "sex",
         "native-country",
     ]
-    label = "salary"  # Make sure this matches your dataset's target column
+    label = "salary"  # Target column in the dataset
 
     X, y, encoder, lb = process_data(
         data, categorical_features=categorical_features, label=label, training=True
@@ -39,26 +37,26 @@ def data_and_model():
 
 def test_model_training_and_inference(data_and_model):
     """
-    Test model training and inference output length.
+    Test that inference returns predictions of correct length.
     """
     _, _, _, _, _, model, X, y = data_and_model
     preds = inference(model, X)
-    assert len(preds) == len(y), "Prediction length should match labels length"
+    assert len(preds) == len(y), "Prediction length should match label length"
 
 def test_model_metrics_computation(data_and_model):
     """
-    Test compute_model_metrics returns valid scores between 0 and 1.
+    Test that compute_model_metrics returns values between 0 and 1.
     """
     _, _, _, _, _, model, X, y = data_and_model
     preds = inference(model, X)
     precision, recall, fbeta = compute_model_metrics(y, preds)
-    assert 0 <= precision <= 1
-    assert 0 <= recall <= 1
-    assert 0 <= fbeta <= 1
+    assert 0 <= precision <= 1, "Precision should be between 0 and 1"
+    assert 0 <= recall <= 1, "Recall should be between 0 and 1"
+    assert 0 <= fbeta <= 1, "F1 score should be between 0 and 1"
 
 def test_performance_on_data_slice(data_and_model):
     """
-    Test performance metrics on a slice of the data.
+    Test performance metrics computation on a slice of the data.
     """
     data, categorical_features, label, encoder, lb, model, _, _ = data_and_model
     slice_value = data["workclass"].iloc[0]
@@ -72,6 +70,6 @@ def test_performance_on_data_slice(data_and_model):
         lb=lb,
         model=model,
     )
-    assert 0 <= precision <= 1
-    assert 0 <= recall <= 1
-    assert 0 <= fbeta <= 1
+    assert 0 <= precision <= 1, "Slice precision should be between 0 and 1"
+    assert 0 <= recall <= 1, "Slice recall should be between 0 and 1"
+    assert 0 <= fbeta <= 1, "Slice F1 score should be between 0 and 1"
