@@ -2,6 +2,14 @@ import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+
+
+from ml.data import process_data
+import inspect
+print("process_data is from:", inspect.getfile(process_data))
+print("process_data signature:", inspect.signature(process_data))
+
+
 from ml.data import process_data
 from ml.model import (
     compute_model_metrics,
