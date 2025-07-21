@@ -23,7 +23,7 @@ data = pd.read_csv(data_path)
 # Split the data into train and test datasets (80% train, 20% test)
 train, test = train_test_split(data, test_size=0.20, random_state=42)
 
-# DO NOT MODIFY - categorical features list
+# List of categorical features (do not modify)
 cat_features = [
     "workclass",
     "education",
@@ -35,7 +35,7 @@ cat_features = [
     "native-country",
 ]
 
-# Process the training data - IMPORTANT: pass train DataFrame as first argument
+# Process the training data (pass train dataset as first positional argument)
 X_train, y_train, encoder, lb = process_data(
     train,
     categorical_features=cat_features,
@@ -45,7 +45,7 @@ X_train, y_train, encoder, lb = process_data(
     lb=None,
 )
 
-# Process the test data using the same encoder and label binarizer - pass test DataFrame first
+# Process the test data (pass test dataset as first positional argument)
 X_test, y_test, _, _ = process_data(
     test,
     categorical_features=cat_features,
@@ -59,32 +59,35 @@ X_test, y_test, _, _ = process_data(
 model = train_model(X_train, y_train)
 
 # Save the model and encoder to files
-model_path = os.path.join(project_path, "model", "model.pkl")
+model_dir = os.path.join(project_path, "model")
+os.makedirs(model_dir, exist_ok=True)
+
+model_path = os.path.join(model_dir, "model.pkl")
 save_model(model, model_path)
 
-encoder_path = os.path.join(project_path, "model", "encoder.pkl")
+encoder_path = os.path.join(model_dir, "encoder.pkl")
 save_model(encoder, encoder_path)
 
-# Load the model back (to simulate deployment loading)
+# Load the model back (simulate deployment)
 model = load_model(model_path)
 
 # Run inference on the test dataset
 preds = inference(model, X_test)
 
 # Compute and print the performance metrics
-p, r, fb = compute_model_metrics(y_test, preds)
-print(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}")
+precision, recall, fbeta = compute_model_metrics(y_test, preds)
+print(f"Precision: {precision:.4f} | Recall: {recall:.4f} | F1: {fbeta:.4f}")
 
 # Clear previous slice outputs if exist
 slice_output_file = "slice_output.txt"
 if os.path.exists(slice_output_file):
     os.remove(slice_output_file)
 
-# Compute performance on slices and save results
+# Compute performance on slices and save results to slice_output.txt
 for col in cat_features:
     for slice_value in sorted(test[col].unique()):
         count = test[test[col] == slice_value].shape[0]
-        p, r, fb = performance_on_categorical_slice(
+        precision, recall, fbeta = performance_on_categorical_slice(
             data=test,
             column_name=col,
             slice_value=slice_value,
@@ -96,4 +99,4 @@ for col in cat_features:
         )
         with open(slice_output_file, "a") as f:
             print(f"{col}: {slice_value}, Count: {count:,}", file=f)
-            print(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}", file=f)
+            print(f"Precision: {precision:.4f} | Recall: {recall:.4f} | F1: {fbeta:.4f}", file=f)
