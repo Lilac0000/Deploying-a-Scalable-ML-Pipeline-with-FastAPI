@@ -24,8 +24,11 @@ class Data(BaseModel):
     native_country: str = Field(..., example="United-States", alias="native-country")
 
 # ✅ TODO: Provide paths to saved models
-encoder = load_model("model/encoder.pkl")
-model = load_model("model/model.pkl")
+base_dir = os.path.dirname(__file__)
+model = load_model(os.path.join(base_dir, "model", "model.pkl"))
+encoder = load_model(os.path.join(base_dir, "model", "encoder.pkl"))
+lb = load_model(os.path.join(base_dir, "model", "lb.pkl"))  # Add this if your apply_label needs it
+
 
 # ✅ TODO: Create a FastAPI app
 app = FastAPI()
@@ -64,4 +67,5 @@ async def post_inference(data: Data):
     # ✅ TODO: Make prediction
     _inference = inference(model, data_processed)
 
-    return {"result": apply_label(_inference)}
+    return {"result": apply_label(_inference, lb)}
+
