@@ -5,6 +5,9 @@ Working in a command line environment is recommended for ease of use with git an
 * Option 2: use the supplied file `requirements.txt` to create a new environment with pip
     
 ## Repositories
+## Project Repository
+https://github.com/Lilac0000/Deploying-a-Scalable-ML-Pipeline-with-FastAPI
+
 * Create a directory for the project and initialize git.
     * As you work on the code, continually commit changes. Trained models you want to use in production must be committed to GitHub.
 * Connect your local git repo to GitHub.
