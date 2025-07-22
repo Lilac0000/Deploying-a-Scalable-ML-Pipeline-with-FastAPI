@@ -27,7 +27,7 @@ class Data(BaseModel):
 base_dir = os.path.dirname(__file__)
 model = load_model(os.path.join(base_dir, "model", "model.pkl"))
 encoder = load_model(os.path.join(base_dir, "model", "encoder.pkl"))
-lb = load_model(os.path.join(base_dir, "model", "lb.pkl"))  # Add this if your apply_label needs it
+
 
 
 # ✅ TODO: Create a FastAPI app
