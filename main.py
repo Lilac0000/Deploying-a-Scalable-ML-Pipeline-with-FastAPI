@@ -67,5 +67,6 @@ async def post_inference(data: Data):
     # ✅ TODO: Make prediction
     _inference = inference(model, data_processed)
 
-    return {"result": apply_label(_inference, lb)}
+    return {"result": apply_label(_inference)}
+
 
